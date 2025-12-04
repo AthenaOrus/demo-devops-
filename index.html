@@ -3,42 +3,515 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Demo DevOps</title>
+    <title>Todo Liste Violette | DevOps Demo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f0f4f8;
+        :root {
+            --primary-purple: #6a1b9a;
+            --light-purple: #9c4dcc;
+            --dark-purple: #38006b;
+            --accent-purple: #ba68c8;
+            --light-bg: #f5f0fa;
+            --text-dark: #333;
+            --text-light: #fff;
+            --shadow: 0 4px 12px rgba(106, 27, 154, 0.2);
+        }
+        
+        * {
             margin: 0;
-            padding: 40px;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f0fa 0%, #e8e0f5 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text-dark);
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        header {
             text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
         }
-
+        
         h1 {
-            color: #1e88e5;
+            color: var(--primary-purple);
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
         }
-
-        p {
-            font-size: 18px;
-            color: #444;
+        
+        .subtitle {
+            color: var(--light-purple);
+            font-size: 1.2rem;
+            margin-bottom: 20px;
         }
-
+        
         .card {
             background: white;
-            width: 60%;
-            margin: 40px auto;
+            border-radius: 16px;
             padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .devops-banner {
+            background: linear-gradient(to right, var(--primary-purple), var(--light-purple));
+            color: white;
+            padding: 15px;
             border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(106, 27, 154, 0.3);
+        }
+        
+        .input-section {
+            display: flex;
+            margin-bottom: 30px;
+            gap: 10px;
+        }
+        
+        #todoInput {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+        
+        #todoInput:focus {
+            outline: none;
+            border-color: var(--light-purple);
+        }
+        
+        .btn {
+            padding: 15px 25px;
+            background: var(--primary-purple);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn:hover {
+            background: var(--dark-purple);
+        }
+        
+        .btn-add {
+            background: var(--light-purple);
+        }
+        
+        .btn-add:hover {
+            background: var(--primary-purple);
+        }
+        
+        .filters {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .filter-btn {
+            padding: 10px 20px;
+            background: #f0e6f7;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--primary-purple);
+            transition: all 0.3s;
+        }
+        
+        .filter-btn.active {
+            background: var(--primary-purple);
+            color: white;
+        }
+        
+        .filter-btn:hover:not(.active) {
+            background: #e2d4f0;
+        }
+        
+        .todo-list {
+            list-style-type: none;
+            margin-top: 20px;
+        }
+        
+        .todo-item {
+            background: #f9f5ff;
+            padding: 18px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s;
+            border-left: 5px solid var(--light-purple);
+        }
+        
+        .todo-item:hover {
+            background: #f3ebff;
+            transform: translateX(5px);
+        }
+        
+        .todo-item.completed {
+            opacity: 0.7;
+            border-left-color: #aaa;
+        }
+        
+        .todo-text {
+            flex: 1;
+            margin: 0 15px;
+            font-size: 1.1rem;
+        }
+        
+        .todo-item.completed .todo-text {
+            text-decoration: line-through;
+            color: #777;
+        }
+        
+        .todo-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 8px;
+            border-radius: 6px;
+            transition: background 0.2s;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .complete-btn {
+            color: #4caf50;
+        }
+        
+        .complete-btn:hover {
+            background: rgba(76, 175, 80, 0.1);
+        }
+        
+        .delete-btn {
+            color: #f44336;
+        }
+        
+        .delete-btn:hover {
+            background: rgba(244, 67, 54, 0.1);
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: var(--primary-purple);
+            font-weight: 600;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #888;
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #d1c4e9;
+        }
+        
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: var(--light-purple);
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            .input-section {
+                flex-direction: column;
+            }
+            
+            .filters {
+                flex-wrap: wrap;
+            }
+            
+            .todo-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .todo-actions {
+                align-self: flex-end;
+            }
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: var(--light-purple);
+            font-size: 0.9rem;
+            padding: 20px;
         }
     </style>
 </head>
 <body>
-
-    <div class="card">
-        <h1>Bienvenue dans le Pipeline DevOps</h1>
-        <p>Ce site est déployé automatiquement grâce à GitHub Actions 🚀</p>
-        <p>CI/CD en action  jgfjfjghtest </p>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-tasks"></i> Todo Liste Violette</h1>
+            <p class="subtitle">Gérez vos tâches avec style et efficacité</p>
+        </header>
+        
+        <div class="devops-banner">
+            <i class="fas fa-rocket"></i> Ce site est déployé automatiquement grâce à GitHub Actions 🚀 | CI/CD en action
+        </div>
+        
+        <div class="card">
+            <h2><i class="fas fa-plus-circle"></i> Ajouter une nouvelle tâche</h2>
+            <div class="input-section">
+                <input type="text" id="todoInput" placeholder="Saisissez votre tâche ici...">
+                <button class="btn btn-add" id="addTodoBtn">
+                    <i class="fas fa-plus"></i> Ajouter
+                </button>
+            </div>
+            
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">Toutes</button>
+                <button class="filter-btn" data-filter="active">Actives</button>
+                <button class="filter-btn" data-filter="completed">Terminées</button>
+            </div>
+            
+            <ul class="todo-list" id="todoList">
+                <!-- Les tâches seront ajoutées ici dynamiquement -->
+            </ul>
+            
+            <div id="emptyState" class="empty-state">
+                <i class="fas fa-clipboard-list"></i>
+                <h3>Aucune tâche pour le moment</h3>
+                <p>Commencez par ajouter une tâche ci-dessus</p>
+            </div>
+            
+            <div class="stats">
+                <div class="total-tasks">
+                    <i class="fas fa-list-check"></i> Tâches totales: <span id="totalCount">0</span>
+                </div>
+                <div class="remaining-tasks">
+                    <i class="fas fa-clock"></i> Restantes: <span id="remainingCount">0</span>
+                </div>
+                <div class="completed-tasks">
+                    <i class="fas fa-check-circle"></i> Terminées: <span id="completedCount">0</span>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Todo Liste Violette Fonctionnelle | Démo DevOps | Développé avec HTML, CSS & JavaScript</p>
+            <p><i class="fas fa-code"></i> Appuyez sur Entrée pour ajouter une tâche</p>
+        </footer>
     </div>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Éléments DOM
+            const todoInput = document.getElementById('todoInput');
+            const addTodoBtn = document.getElementById('addTodoBtn');
+            const todoList = document.getElementById('todoList');
+            const emptyState = document.getElementById('emptyState');
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            
+            // Compteurs
+            const totalCountEl = document.getElementById('totalCount');
+            const remainingCountEl = document.getElementById('remainingCount');
+            const completedCountEl = document.getElementById('completedCount');
+            
+            // Variables d'état
+            let todos = JSON.parse(localStorage.getItem('todos')) || [];
+            let currentFilter = 'all';
+            
+            // Initialiser l'application
+            initApp();
+            
+            // Fonction d'initialisation
+            function initApp() {
+                renderTodos();
+                updateStats();
+                
+                // Événements
+                addTodoBtn.addEventListener('click', addTodo);
+                todoInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') addTodo();
+                });
+                
+                // Événements pour les filtres
+                filterBtns.forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        // Mettre à jour le filtre actif
+                        filterBtns.forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // Changer le filtre et re-rendre
+                        currentFilter = this.getAttribute('data-filter');
+                        renderTodos();
+                    });
+                });
+            }
+            
+            // Ajouter une nouvelle tâche
+            function addTodo() {
+                const text = todoInput.value.trim();
+                
+                if (text === '') {
+                    alert('Veuillez saisir une tâche');
+                    return;
+                }
+                
+                // Créer un nouvel objet todo
+                const todo = {
+                    id: Date.now(),
+                    text: text,
+                    completed: false,
+                    createdAt: new Date().toISOString()
+                };
+                
+                // Ajouter au tableau
+                todos.push(todo);
+                
+                // Sauvegarder dans localStorage
+                saveTodos();
+                
+                // Réinitialiser le champ de saisie
+                todoInput.value = '';
+                
+                // Re-rendre la liste
+                renderTodos();
+                updateStats();
+            }
+            
+            // Basculer l'état complet/incomplet d'une tâche
+            function toggleTodo(id) {
+                todos = todos.map(todo => {
+                    if (todo.id === id) {
+                        return { ...todo, completed: !todo.completed };
+                    }
+                    return todo;
+                });
+                
+                saveTodos();
+                renderTodos();
+                updateStats();
+            }
+            
+            // Supprimer une tâche
+            function deleteTodo(id) {
+                if (!confirm('Voulez-vous vraiment supprimer cette tâche ?')) return;
+                
+                todos = todos.filter(todo => todo.id !== id);
+                
+                saveTodos();
+                renderTodos();
+                updateStats();
+            }
+            
+            // Filtrer les tâches selon le filtre actif
+            function getFilteredTodos() {
+                switch(currentFilter) {
+                    case 'active':
+                        return todos.filter(todo => !todo.completed);
+                    case 'completed':
+                        return todos.filter(todo => todo.completed);
+                    default:
+                        return todos;
+                }
+            }
+            
+            // Afficher les tâches
+            function renderTodos() {
+                const filteredTodos = getFilteredTodos();
+                
+                // Afficher/masquer l'état vide
+                if (filteredTodos.length === 0) {
+                    emptyState.style.display = 'block';
+                    todoList.innerHTML = '';
+                } else {
+                    emptyState.style.display = 'none';
+                    
+                    // Générer le HTML des tâches
+                    todoList.innerHTML = filteredTodos.map(todo => `
+                        <li class="todo-item ${todo.completed ? 'completed' : ''}" data-id="${todo.id}">
+                            <button class="action-btn complete-btn" onclick="toggleTodo(${todo.id})">
+                                <i class="fas fa-${todo.completed ? 'check-circle' : 'circle'}"></i>
+                            </button>
+                            <span class="todo-text">${todo.text}</span>
+                            <div class="todo-actions">
+                                <button class="action-btn delete-btn" onclick="deleteTodo(${todo.id})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </li>
+                    `).join('');
+                }
+            }
+            
+            // Mettre à jour les statistiques
+            function updateStats() {
+                const total = todos.length;
+                const completed = todos.filter(todo => todo.completed).length;
+                const remaining = total - completed;
+                
+                totalCountEl.textContent = total;
+                remainingCountEl.textContent = remaining;
+                completedCountEl.textContent = completed;
+            }
+            
+            // Sauvegarder dans localStorage
+            function saveTodos() {
+                localStorage.setItem('todos', JSON.stringify(todos));
+            }
+            
+            // Exposer les fonctions au scope global pour les événements onclick
+            window.toggleTodo = toggleTodo;
+            window.deleteTodo = deleteTodo;
+        });
+    </script>
 </body>
 </html>
