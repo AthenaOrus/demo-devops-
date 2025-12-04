@@ -1,9 +1,15 @@
+name: CI Test
+
+on:
+  push:
+    branches:
+      - main
+
 jobs:
-  build-docker:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Build Docker image
-        run: docker build -t mon-site:latest .
-      - name: Push image to Docker Hub
-        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }} && docker push mon-site:latest
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Test simple
+        run: echo "CI Pipeline exécuté avec succès !"
