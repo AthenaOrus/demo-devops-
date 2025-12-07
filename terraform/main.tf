@@ -14,8 +14,8 @@ resource "docker_image" "app" {
   keep_locally = true
 }
 
-resource "docker_container" "site" {
-  name  = "site-rania-terraform"
+resource "docker_container" "web" {
+  name  = "site-rania-auto"
   image = docker_image.app.name
   ports {
     internal = 80
