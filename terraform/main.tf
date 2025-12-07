@@ -14,8 +14,8 @@ resource "docker_image" "site" {
   keep_locally = true
 }
 
-resource "docker_container" "site_container" {
-  name  = "mon-site-devops"
+resource "docker_container" "web" {
+  name  = "site-devops-rania"
   image = docker_image.site.name
   ports {
     internal = 80
