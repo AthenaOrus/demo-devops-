@@ -15,7 +15,7 @@ jobs:
       - name: Set up Docker
         uses: docker/setup-buildx-action@v3
 
-      # Installe Terraform
+      
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
 
