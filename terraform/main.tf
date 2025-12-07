@@ -9,14 +9,14 @@ terraform {
 
 provider "docker" {}
 
-resource "docker_image" "site" {
+resource "docker_image" "app" {
   name         = "rania975/demo-devops:latest"
   keep_locally = true
 }
 
-resource "docker_container" "web" {
-  name  = "site-devops-rania"
-  image = docker_image.site.name
+resource "docker_container" "site" {
+  name  = "site-rania-terraform"
+  image = docker_image.app.name
   ports {
     internal = 80
     external = 8080
