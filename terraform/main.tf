@@ -7,24 +7,33 @@ terraform {
   }
 }
 
-provider "docker" {}
-
-resource "docker_image" "app" {
-  name         = "rania975/demo-devops:latest"
-  keep_locally = true
+provider "docker" {
+  host = "unix:///var/run/docker.sock"
 }
 
+# Image Docker
+resource "docker_image" "nginx" {
+  name = "demo-devops-nginx:latest"
+  build {
+    context = "."
+    tag     = ["demo-devops-nginx:latest"]
+  }
+}
+
+# Conteneur Docker
 resource "docker_container" "web" {
-  name  = "site-rania-auto"
-  image = docker_image.app.name
-  restar = "unless-stopped" 
+  name  = "demo-devops-container"
+  image = docker_image.nginx.image_id
+
   ports {
     internal = 80
     external = 8080
   }
 
-  volume{
-    container_path ="/app/data"
-    host_path      = "/path/on/host"
+  volumes {
+    host_path      = "${path.cwd}/index.html"
+    container_path = "/usr/share/nginx/html/index.html"
   }
+
+  restart = "unless-stopped"
 }

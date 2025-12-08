@@ -1,4 +1,11 @@
+# Utiliser une image Nginx légère
 FROM nginx:alpine
-COPY index.html /usr/share/nginx/index.html
+
+# Copier le fichier HTML dans le répertoire par défaut de Nginx
+COPY index.html /usr/share/nginx/html/
+
+# Exposer le port 80
 EXPOSE 80
-CMD ["ngingx", "-g" , "daemonoff;"]
+
+# Nginx démarre automatiquement avec l'image
+CMD ["nginx", "-g", "daemon off;"]

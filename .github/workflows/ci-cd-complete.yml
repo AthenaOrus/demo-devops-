@@ -1,0 +1,78 @@
+name: CI/CD Pipeline Complet
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  # Job 1: Tests et Build Docker
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v3
+
+      - name: Vérifier la syntaxe HTML
+        run: |
+          echo "Vérification du fichier HTML..."
+          if [ -f "index.html" ]; then
+            echo "✅ index.html trouvé"
+          else
+            echo "❌ index.html introuvable"
+            exit 1
+          fi
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build Docker Image
+        run: |
+          docker build -t demo-devops:latest .
+          echo "✅ Image Docker créée avec succès"
+
+      - name: Test du conteneur Docker
+        run: |
+          docker run -d -p 8080:80 --name test-container demo-devops:latest
+          sleep 5
+          curl http://localhost:8080 || exit 1
+          docker stop test-container
+          docker rm test-container
+          echo "✅ Test du conteneur réussi"
+
+      - name: Login to Docker Hub (optionnel)
+        if: github.event_name == 'push'
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Push to Docker Hub (optionnel)
+        if: github.event_name == 'push'
+        run: |
+          docker tag demo-devops:latest ${{ secrets.DOCKER_USERNAME }}/demo-devops:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/demo-devops:latest
+
+  # Job 2: Déploiement via FTP
+  deploy-ftp:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Deploy via FTP vers InfinityFree
+        uses: SamKirkland/FTP-Deploy-Action@v4.0.0
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./
+          server-dir: /htdocs/
+          dry-run: false
+
+      - name: Notification de déploiement
+        run: |
+          echo "🚀 Déploiement terminé sur InfinityFree!"
+          echo "✅ Pipeline CI/CD exécuté avec succès"
