@@ -1,4 +1,3 @@
 FROM nginx:alpine
-COPY ./ /usr/share/nginx/html
+COPY . /usr/share/nginx/html/  # Copie tout (index.html + CSS + JS)
 EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
