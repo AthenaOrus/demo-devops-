@@ -1,38 +1,25 @@
-# .github/workflows/terraform.yml
-name: Terraform + Docker (AUTOMATIQUE)
+name: Terraform + Docker Auto
 
-# Se déclenche automatiquement à chaque push sur main
 on:
   push:
     branches: [ main ]
     paths:
-      - 'terraform/**'      # seulement si tu modifies le dossier terraform
+      - 'terraform/**'
       - 'Dockerfile'
       - 'index.html'
 
 jobs:
-  terraform-docker:
+  terraform:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: hashicorp/setup-terraform@v3
 
-      # Nécessaire pour que le provider Docker de Terraform fonctionne
-      - name: Set up Docker
-        uses: docker/setup-buildx-action@v3
-
-      # Installe Terraform
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-
-      # Initialise et applique Terraform automatiquement
       - name: Terraform Init
         working-directory: ./terraform
         run: terraform init
 
-      - name: Terraform Apply (automatique)
+      - name: Terraform Apply
         working-directory: ./terraform
         run: terraform apply -auto-approve
-
-      - name: SUCCÈS TOTAL
-        run: echo "Terraform a lancé le conteneur Docker automatiquement !"
