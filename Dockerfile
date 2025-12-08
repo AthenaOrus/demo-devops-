@@ -1,10 +1,4 @@
 FROM nginx:alpine
-
-# Nettoyer le dossier par défaut
-RUN rm -rf /usr/share/nginx/html/*
-
-# Copier tes fichiers locaux vers Nginx
-COPY . /usr/share/nginx/html
-
-# Exposer le port 80
+COPY index.html /usr/share/nginx/index.html
 EXPOSE 80
+CMD ["ngingx", "-g" , "daemonoff;"]

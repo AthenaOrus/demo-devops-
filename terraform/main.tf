@@ -17,8 +17,14 @@ resource "docker_image" "app" {
 resource "docker_container" "web" {
   name  = "site-rania-auto"
   image = docker_image.app.name
+  restar = "unless-stopped" 
   ports {
     internal = 80
     external = 8080
+  }
+
+  volume{
+    container_path ="/app/data"
+    host_path      = "/path/on/host"
   }
 }
