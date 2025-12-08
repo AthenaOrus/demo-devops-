@@ -2,10 +2,16 @@ version: '3.8'
 
 services:
   web:
-    build: .
+    build:
+      context: .
+      args:
+        BUILD_DATE: ${BUILD_DATE:-$(date -u +'%Y-%m-%dT%H:%M:%SZ')}
+    image: demo-devops-nginx:latest
     ports:
       - "8080:80"
-    volumes:
-      - ./index.html:/usr/share/nginx/html/index.html
+    # Volume commenté pour utiliser la version de l'image
+    # Décommenter pour développement en direct
+    # volumes:
+    #   - ./index.html:/usr/share/nginx/html/index.html
     restart: unless-stopped
     container_name: demo-devops-web
