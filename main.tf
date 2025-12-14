@@ -1,45 +1,50 @@
-name: Terraform + Docker Auto
+terraform {
+  required_providers {
+    docker = {
+      source  = "kreuzwerker/docker"
+      version = "~> 3.0"
+    }
+  }
+}
 
-on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'main.tf'
-      - 'Dockerfile'
-      - 'index.html'
-  workflow_dispatch:
+provider "docker" {
+  # Pour Linux/Mac
+  host = "unix:///var/run/docker.sock"
+  
+  # Pour Windows, décommenter la ligne suivante :
+  # host = "npipe:////./pipe/docker_engine"
+}
 
-jobs:
-  terraform-validate:
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+# Image Docker
+resource "docker_image" "nginx" {
+  name = "demo-devops-nginx:latest"
+  build {
+    context    = path.cwd
+    dockerfile = "Dockerfile"
+    tag        = ["demo-devops-nginx:latest"]
+    no_cache   = true
+  }
+  
+  # Force la reconstruction si le Dockerfile change
+  triggers = {
+    dockerfile_hash = filemd5("${path.cwd}/Dockerfile")
+    html_hash       = filemd5("${path.cwd}/index.html")
+  }
+}
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: "1.6.6"
-          terraform_wrapper: false
+# Conteneur Docker
+resource "docker_container" "web" {
+  name  = "demo-devops-terraform"
+  image = docker_image.nginx.image_id
 
-      - name: Terraform Format Check
-        run: terraform fmt -check
-        continue-on-error: true
+  ports {
+    internal = 80
+    external = 8080
+  }
 
-      - name: Terraform Init
-        run: |
-          terraform init
-        env:
-          TF_CLI_ARGS_init: "-upgrade"
-
-      - name: Terraform Validate
-        run: terraform validate
-
-      - name: Terraform Plan
-        run: terraform plan -out=tfplan
-        continue-on-error: true
-
-      - name: ✅ Validation réussie
-        run: echo "✅ Terraform configuration validée avec succès!"
+  # Pas de volume - utilise la version dans l'image
+  restart = "unless-stopped"
+  
+  # Force le remplacement si l'image change
+  must_run = true
+}
